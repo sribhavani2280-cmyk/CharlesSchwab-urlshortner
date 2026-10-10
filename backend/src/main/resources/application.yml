@@ -1,0 +1,52 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: agentic-url-shortener
+  datasource:
+    url: jdbc:h2:file:./data/appdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: false
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when_authorized
+
+app:
+  base-url: http://localhost:8080
+  security:
+    # Protects management/analytics/orchestration APIs. Redirects stay public.
+    # Override locally via APP_SECURITY_API_KEY. Never commit a real secret.
+    api-key: ${APP_SECURITY_API_KEY:local-dev-key}
+  shortcode:
+    length: 7
+    max-collision-retries: 5
+  llm:
+    # provider: stub (deterministic, offline) or openai (requires OPENAI_API_KEY).
+    provider: ${APP_LLM_PROVIDER:stub}
+    openai:
+      base-url: https://api.openai.com
+      api-key: ${OPENAI_API_KEY:}
+      model: gpt-4o-mini
+      timeout-seconds: 30
+  orchestration:
+    parallel: true
+    default-max-attempts: 2
